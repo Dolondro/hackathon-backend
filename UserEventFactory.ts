@@ -6,8 +6,8 @@ export default function(text: string, sock: WebSocket)
     try{
         let object = JSON.parse(text);
         console.log(object);
-        if (object['eventName'] === undefined) {
-            console.error("UserEvent did not pass eventName");
+        if (object['name'] === undefined) {
+            console.error("UserEvent did not pass name");
             return null;
         }
 
@@ -16,7 +16,7 @@ export default function(text: string, sock: WebSocket)
             return null;
         }
 
-        let event = new AppEvent(object['eventName'], object['params'], sock);
+        let event = new AppEvent(object['name'], object['params'], sock);
         console.log(event);
         return event;
     } catch (e) {

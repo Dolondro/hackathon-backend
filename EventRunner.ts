@@ -1,7 +1,7 @@
 import AppEvent from "./AppEvent.ts";
 import { Game } from "./game.ts";
 import UserEventEmitter from "./UserEventEmitter.ts";
-import { WebSocket } from "../../../../Users/doug/Library/Caches/deno/deps/https/deno.land/std/ws/mod.ts";
+import { WebSocket } from "https://deno.land/std/ws/mod.ts";
 // import rand from "https://github.com/rsp/deno-rand"
 
 // Because I'm a terrible person, I'm going to put all my f'ing state on here. Also my domain logic. And everything. All because it's half 3 and I've not got much work done
@@ -49,13 +49,12 @@ export default function run(event: AppEvent)
     let player = getPlayer(event.connection);
     if (player === null) {
         if (name === "identify") {
-            connectionMap[params['id']] = event.connection;
-            playerMap[params['id']] = {
-                id: params['id'],
-                name: params['name'],
-                image: params['image'],
-                connection: event.connection
-            }
+            let user = params['user'];
+            let userId = user.id;
+            connectionMap[userId] = event.connection;
+            playerMap[userId] = user;
+            playerMap[userId]['connection'] = event.connection;
+            console.log(playerMap);
         }
         return;
     }
@@ -104,7 +103,7 @@ export default function run(event: AppEvent)
                 }
             }
             break;
-            
+
     }
 
     
