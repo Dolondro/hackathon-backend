@@ -1,11 +1,11 @@
 import { WebSocket } from "https://deno.land/std/ws/mod.ts";
-import UserEvent from "./UserEvent.ts"
 import AppEvent from "./AppEvent.ts";
 
 export default function(text: string, sock: WebSocket)
 {
     try{
         let object = JSON.parse(text);
+        console.log(object);
         if (object['eventName'] === undefined) {
             console.error("UserEvent did not pass eventName");
             return null;

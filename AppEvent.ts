@@ -6,7 +6,7 @@ export default class AppEvent
     params: object;
     connection: WebSocket|null
 
-    constructor(name: string, params: object, connection: WebSocket|null)
+    constructor(name: string, params: object, connection: WebSocket|null = null)
     {
         this.name = name;
         this.params = params;
