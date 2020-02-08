@@ -39,6 +39,7 @@ function getPlayer(connection: WebSocket) {
     return null;
 }
 
+
 export default function run(event: AppEvent)
 {
     console.log("Trying to handle", event);
@@ -59,9 +60,10 @@ export default function run(event: AppEvent)
         return;
     }
 
+    let id;
     switch (name) {
         case "create":
-            let id = makeId(6);
+            id = makeId(6);
             games[id] = new Game(id);
             // Send the original connection a "enter-game" event
             emit(new AppEvent('enter-game', {gameId: id}), event.connection)
@@ -71,16 +73,36 @@ export default function run(event: AppEvent)
 
         case "join":
             if (games[id] !== undefined) {
-                emit(new AppEvent('enter-game', {gameId: id}), event.connection);
+                let players = games[id].players;
+                emit(new AppEvent('enter-game', {gameId: id, players: players}), event.connection);
                 games[id].addPlayer(player.id);
                 emitToPlayers(games[id], new AppEvent('user-entered-game', {gameId: id, playerId: player.id, playerName: player.name}))
             }
             break;
 
         case "answer":
+            id = params['gameId'];
+            if (games[id] !== undefined) {
+                if (games[id].answerQuestion(player.id, params['questionId'], params['answer'])) {
+                    emitToPlayers(games[id], new AppEvent('user-answered', {gameId: id, playerId: player.id, questionId: params['questionId']}));
+                }
+            }
             break;
 
         case "ready":
+            id = params['gameId'];
+            if (games[id] !== undefined) {
+                games[id].setPlayerReadyState(player.id, params['ready'])
+
+                if (games[id].allPlayersAreReady()) {
+                    emitToPlayers(games[id], new AppEvent('start-game', {gameId: id, wait: 5000}));
+                    setTimeout(function() {
+                        emitToPlayers(games[id], new AppEvent('question', {gameId: id, question: 'Why is Andy such a strange man', answers: [
+                            'Potato Salad', 'Brotkast', 'Banana Republic', 'Cheeese'
+                        ]}));
+                    }, 5000);
+                }
+            }
             break;
             
     }
